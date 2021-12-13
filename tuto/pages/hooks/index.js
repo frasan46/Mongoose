@@ -6,9 +6,11 @@ import dynamic from 'next/dynamic'
 import { useMemo } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
 import contectarDB from '../lib/dbConnect';
+import Pokemon from '../../models/Pokemon';
+import { Mongoose } from 'mongoose';
 
-export default function useEffectPage() {
-
+export default function useEffectPage({Pokemons}) {
+  console.log(Pokemons)
     const [resourceType, setResourceType] = useState('');
     const [numero, cantidad] = useState('');
 
@@ -96,7 +98,33 @@ export default function useEffectPage() {
        // datos.push(stats[i]["base_stat"])
        
        }
-      
+      const  handleSubmit = async (guardar) => {
+    
+        try{
+          let contReal =  guardar -1
+         // let contenido= "{Pokemon:" + contReal+ "}"
+          //console.log(contenido)
+          const res =  await fetch("/api/hello",{
+            method:"POST",
+           headers:{
+              "Content-type": "application/json"
+            },body:contReal
+})
+
+         
+          }
+         
+        
+        
+        catch(error){
+          console.log(error)
+          console.log("nooooooooooooo")
+        
+         
+        
+        }
+
+      } 
     function aparecer(n){
       setfocus(n)
       divdes.current.style.display = "block"
@@ -129,7 +157,7 @@ pies: {pies}
            <div id="respuesta">
            {nombrePochimon.map((post) => (
              
-          <p onMouseEnter={(e) => aparecer(e.target.id)} id={cont}>{cont++} {post["name"]}</p>
+          <p onMouseEnter={(e) => aparecer(e.target.id)} id={cont}>{cont++} {post["name"]} <button onClick={(i) => handleSubmit(i.target.name)}  name={cont}>+</button></p>
       ))}
 
       </div>
@@ -147,8 +175,15 @@ export async function getServerSideProps(){
 try{
   await contectarDB()
   
+  const resp = await Pokemon.find({})
 
- return {props: { title: 'My Title', content: '...' }}
+  const pokemons = resp.map(doc =>{
+    const movie = doc.toObject()
+    movie._id = `${movie._id}`
+    return movie
+  })
+  console.log(resp)
+  return {props:{Pokemons:pokemons}}
 }
 catch(error){
   console.log(error)
